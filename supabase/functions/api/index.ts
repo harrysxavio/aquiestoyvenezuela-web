@@ -45,17 +45,17 @@ serve(async (req) => {
     // 1. GET /stats
     if (path === "/stats" && method === "GET") {
       const [
-        { count: total, error: e1 },
-        { count: desaparecidos, error: e2 },
-        { count: encontrados, error: e3 },
+        { count: total, error: totalError },
+        { count: desaparecidos, error: desaparecidoError },
+        { count: encontrados, error: encontradoError },
       ] = await Promise.all([
         supabase.from("personas").select("id", { count: "exact", head: true }),
         supabase.from("personas").select("id", { count: "exact", head: true }).eq("estado", "Desaparecido"),
         supabase.from("personas").select("id", { count: "exact", head: true }).eq("estado", "Encontrado"),
       ]);
 
-      if (e1 || e2 || e3) {
-        throw e1 || e2 || e3;
+      if (totalError || desaparecidoError || encontradoError) {
+        throw totalError || desaparecidoError || encontradoError;
       }
 
       return new Response(
