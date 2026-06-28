@@ -238,10 +238,17 @@ async function loadStats() {
         } catch (err) {
             console.warn('Backend API /stats no disponible, usando fallback directo:', err);
             try {
-                const { count: total } = await supabaseClient.from('personas').select('*', { count: 'exact', head: true });
-                const { count: desaparecidos } = await supabaseClient.from('personas').select('*', { count: 'exact', head: true }).eq('estado', 'Desaparecido');
-                const { count: encontrados } = await supabaseClient.from('personas').select('*', { count: 'exact', head: true }).eq('estado', 'Encontrado');
-                
+                // Ejecutar los 3 conteos en paralelo en lugar de secuencial
+                const [
+                    { count: total },
+                    { count: desaparecidos },
+                    { count: encontrados }
+                ] = await Promise.all([
+                    supabaseClient.from('personas').select('*', { count: 'exact', head: true }),
+                    supabaseClient.from('personas').select('*', { count: 'exact', head: true }).eq('estado', 'Desaparecido'),
+                    supabaseClient.from('personas').select('*', { count: 'exact', head: true }).eq('estado', 'Encontrado')
+                ]);
+
                 DOM.statTotal.textContent = total || 0;
                 DOM.statMissing.textContent = desaparecidos || 0;
                 DOM.statFound.textContent = encontrados || 0;
@@ -922,10 +929,12 @@ function setupEventListeners() {
         });
     }
 
-    // Filtro de ubicación (input de texto)
+    // Filtro de ubicación (input de texto) — debounce para evitar N queries por keystroke
+    let ubicacionDebounceTimer;
     DOM.filterUbicacion.addEventListener('input', () => {
         state.ubicacionFilter = DOM.filterUbicacion.value.trim();
-        fetchRecords(false);
+        clearTimeout(ubicacionDebounceTimer);
+        ubicacionDebounceTimer = setTimeout(() => fetchRecords(false), 400);
     });
 
     // Alternar visualización del listado completo
