@@ -238,7 +238,6 @@ async function loadStats() {
         } catch (err) {
             console.warn('Backend API /stats no disponible, usando fallback directo:', err);
             try {
-                // Ejecutar los 3 conteos en paralelo en lugar de secuencial
                 const [
                     { count: total },
                     { count: desaparecidos },
@@ -929,7 +928,6 @@ function setupEventListeners() {
         });
     }
 
-    // Filtro de ubicación (input de texto) — debounce para evitar N queries por keystroke
     let ubicacionDebounceTimer;
     DOM.filterUbicacion.addEventListener('input', () => {
         state.ubicacionFilter = DOM.filterUbicacion.value.trim();
