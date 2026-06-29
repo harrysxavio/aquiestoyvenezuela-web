@@ -30,7 +30,7 @@ body:
     id: technical_constraints
     attributes:
       label: "Restricciones Técnicas y Archivos Clave (Constraints)"
-      description: "Fundamental para la IA: Especifica qué archivos modificar, qué librerías usar y qué patrones arquitectónicos seguir (o evitar)."
+      description: "Fundamental para la IA: Especifica qué archivo(s) modificar, qué librerías usar y qué patrones arquitectónicos seguir (o evitar)."
       value: |
         **Archivos involucrados:**
         - `src/...`
